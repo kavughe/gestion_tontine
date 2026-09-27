@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un versement{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="page-header">
+        <div>
+            <h1>💸 Enregistrer un versement</h1>
+            <p>Enregistrer le montant remis au bénéficiaire</p>
+        </div>
+
+        <a href="{{ url_for('versements') }}" class="btn btn-secondary">
+            ← Retour
+        </a>
+    </div>
+
+    <!-- Informations de la tontine -->
+
+    <div class="info-card">
+
+        <div class="info-item">
+            <span>👥 Participants</span>
+            <strong>21</strong>
+        </div>
+
+        <div class="info-item">
+            <span>💰 Cotisation</span>
+            <strong>7 000 FC</strong>
+        </div>
+
+        <div class="info-item highlight">
+            <span>🏦 Cagnotte</span>
+            <strong>147 000 FC</strong>
+        </div>
+
+    </div>
+
+    <div class="form-card">
+
+        <form method="POST">
+
+            <!-- Tour -->
+
+            <div class="form-group">
+
+                <label for="tour_id">
+                    Tour / Semaine <span>*</span>
+                </label>
+
+                <select
+                    id="tour_id"
+                    name="tour_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Sélectionner le tour --
+                    </option>
+
+                    {% for tour in tours %}
+
+                    <option value="{{ tour.id }}">
+
+                        Semaine {{ tour.numero_semaine }}
+
+                        {% if tour.membre_nom %}
+                            — {{ tour.membre_nom }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <!-- Bénéficiaire -->
+
+            <div class="form-group">
+
+                <label for="membre_id">
+                    Bénéficiaire
+                </label>
+
+                <select
+                    id="membre_id"
+                    name="membre_id"
+                >
+
+                    <option value="">
+                        -- Sélectionner le bénéficiaire --
+                    </option>
+
+                    {% for membre in membres %}
+
+                    <option value="{{ membre.id }}">
+                        {{ membre.nom }}
+
+                        {% if membre.telephone %}
+                            — {{ membre.telephone }}
+                        {% endif %}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <small>
+                    Le bénéficiaire doit normalement correspondre
+                    au membre prévu pour le tour sélectionné.
+                </small>
+
+            </div>
+
+            <!-- Montant -->
+
+            <div class="form-group">
+
+                <label for="montant">
+                    Montant versé <span>*</span>
+                </label>
+
+                <div class="input-with-suffix">
+
+                    <input
+                        type="number"
+                        id="montant"
+                        name="montant"
+                        value="147000"
+                        min="0"
+                        step="100"
+                        required
+                    >
+
+                    <span>FC</span>
+
+                </div>
+
+                <small>
+                    Montant prévu : 147 000 FC.
+                </small>
+
+            </div>
+
+            <!-- Devise -->
+
+            <div class="form-group">
+
+                <label for="devise">
+                    Devise
+                </label>
+
+                <select id="devise" name="devise">
+
+                    <option value="FC" selected>
+                        Franc congolais (FC)
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- Date -->
+
+            <div class="form-group">
+
+                <label for="date_versement">
+                    Date du versement
+                </label>
+
+                <input
+                    type="date"
+                    id="date_versement"
+                    name="date_versement"
+                >
+
+            </div>
+
+            <!-- Statut -->
+
+            <div class="form-group">
+
+                <label for="statut">
+                    Statut
+                </label>
+
+                <select id="statut" name="statut">
+
+                    <option value="Effectué" selected>
+                        ✓ Effectué
+                    </option>
+
+                    <option value="En attente">
+                        ⏳ En attente
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- Remarque -->
+
+            <div class="form-group">
+
+                <label for="remarque">
+                    Remarque
+                </label>
+
+                <textarea
+                    id="remarque"
+                    name="remarque"
+                    rows="4"
+                    placeholder="Exemple : montant remis en espèces..."
+                ></textarea>
+
+            </div>
+
+            <!-- Actions -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('versements') }}"
+                    class="btn btn-secondary"
+                >
+                    Annuler
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    💾 Enregistrer le versement
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+
+.form-page {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+    font-size: 28px;
+}
+
+.page-header p {
+    margin: 0;
+    color: #777;
+}
+
+.info-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.05);
+}
+
+.info-item span {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.info-item strong {
+    font-size: 20px;
+}
+
+.info-item.highlight {
+    border: 2px solid #2563eb;
+}
+
+.form-card {
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+}
+
+.form-group {
+    margin-bottom: 21px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group label span {
+    color: #dc2626;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 14px;
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+    font-size: 15px;
+    background: white;
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    color: #777;
+    font-size: 12px;
+}
+
+.input-with-suffix {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-with-suffix input {
+    border-radius: 10px 0 0 10px;
+}
+
+.input-with-suffix span {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: #f1f5f9;
+    border: 1px solid #dbe2ea;
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+@media (max-width: 768px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header .btn {
+        width: 100%;
+    }
+
+    .info-card {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dateInput = document.getElementById("date_versement");
+
+    if (dateInput && !dateInput.value) {
+
+        const aujourdHui = new Date();
+
+        const annee = aujourdHui.getFullYear();
+        const mois = String(aujourdHui.getMonth() + 1).padStart(2, "0");
+        const jour = String(aujourdHui.getDate()).padStart(2, "0");
+
+        dateInput.value = `${annee}-${mois}-${jour}`;
+    }
+
+});
+</script>
+
+{% endblock %}

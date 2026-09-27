@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+
+{% block title %}Versements{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>💸 Versements</h1>
+        <p>Suivi des montants remis aux bénéficiaires</p>
+    </div>
+
+    <a href="{{ url_for('ajouter_versement') }}" class="btn btn-primary">
+        ➕ Enregistrer un versement
+    </a>
+</div>
+
+<!-- Statistiques -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon">🏦</div>
+        <div>
+            <span class="stat-label">Cagnotte par tour</span>
+            <strong>147 000 FC</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <span class="stat-label">Bénéficiaires</span>
+            <strong>21</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div>
+            <span class="stat-label">Montant prévu par tour</span>
+            <strong>147 000 FC</strong>
+        </div>
+    </div>
+
+</div>
+
+<!-- Historique -->
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Historique des versements</h2>
+            <p>
+                Montants remis aux bénéficiaires
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('ajouter_versement') }}"
+            class="btn btn-primary"
+        >
+            + Ajouter
+        </a>
+
+    </div>
+
+    {% if versements %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Semaine</th>
+                    <th>Bénéficiaire</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Remarque</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for versement in versements %}
+
+                <tr>
+
+                    <td>
+                        <span class="number-badge">
+                            {{ loop.index }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="tour-badge">
+                            Semaine {{ versement.numero_semaine }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {% if versement.membre_nom %}
+                            <strong>
+                                {{ versement.membre_nom }}
+                            </strong>
+                        {% else %}
+                            <span class="not-assigned">
+                                Non défini
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong class="amount">
+                            {{ "{:,.0f}".format(versement.montant|float).replace(",", " ") }}
+                            {{ versement.devise }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ versement.date_versement }}
+                    </td>
+
+                    <td>
+
+                        {% if versement.statut == "Effectué" %}
+
+                            <span class="badge badge-success">
+                                ✓ Effectué
+                            </span>
+
+                        {% elif versement.statut == "En attente" %}
+
+                            <span class="badge badge-warning">
+                                ⏳ En attente
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge badge-info">
+                                {{ versement.statut }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ versement.remarque or "—" }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">💸</div>
+
+        <h3>Aucun versement</h3>
+
+        <p>
+            Aucun montant n'a encore été remis à un bénéficiaire.
+        </p>
+
+        <a
+            href="{{ url_for('ajouter_versement') }}"
+            class="btn btn-primary"
+        >
+            ➕ Enregistrer le premier versement
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<style>
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+    font-size: 28px;
+}
+
+.page-header p {
+    margin: 0;
+    color: #777;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stat-label {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.stat-card strong {
+    font-size: 19px;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card-header h2 {
+    margin: 0 0 5px;
+    font-size: 20px;
+}
+
+.card-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    background: #f8fafc;
+    padding: 13px;
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+}
+
+td {
+    padding: 14px 13px;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.number-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #eef2ff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.tour-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.amount {
+    color: #166534;
+}
+
+.not-assigned {
+    color: #999;
+    font-style: italic;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header .btn {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .card-header .btn {
+        width: 100%;
+    }
+
+    th,
+    td {
+        padding: 11px 9px;
+    }
+
+}
+
+</style>
+
+{% endblock %}

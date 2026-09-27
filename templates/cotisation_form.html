@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une cotisation{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Ajouter une cotisation</h1>
+        <p>Enregistrer la participation d'un membre pour un tour.</p>
+    </div>
+
+    <a href="{{ url_for('cotisations') }}" class="btn btn-secondary">
+        ← Retour
+    </a>
+</div>
+
+<div class="form-card">
+
+    <form method="POST">
+
+        <!-- MEMBRE -->
+        <div class="form-group">
+            <label for="membre_id">Membre</label>
+
+            <select name="membre_id" id="membre_id" required>
+                <option value="">-- Sélectionner un membre --</option>
+
+                {% for membre in membres %}
+                    <option value="{{ membre.id }}">
+                        {{ membre.nom }}
+                        {% if membre.telephone %}
+                            — {{ membre.telephone }}
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <!-- TOUR -->
+        <div class="form-group">
+            <label for="tour_id">Tour / Semaine</label>
+
+            <select name="tour_id" id="tour_id" required>
+                <option value="">-- Sélectionner le tour --</option>
+
+                {% for tour in tours %}
+                    <option value="{{ tour.id }}">
+                        Tour {{ tour.numero_semaine }}
+                        — {{ "{:,.0f}".format(tour.montant_prevu|float).replace(",", " ") }} FC
+                        {% if tour.membre_nom %}
+                            — Bénéficiaire : {{ tour.membre_nom }}
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <!-- MONTANT -->
+        <div class="form-group">
+            <label for="montant">Montant</label>
+
+            <input
+                type="number"
+                name="montant"
+                id="montant"
+                value="7000"
+                min="0"
+                step="100"
+                required
+            >
+
+            <small>
+                Cotisation normale : <strong>7 000 FC</strong>
+            </small>
+        </div>
+
+
+        <!-- DEVISE -->
+        <div class="form-group">
+            <label for="devise">Devise</label>
+
+            <select name="devise" id="devise">
+                <option value="FC" selected>Franc Congolais (FC)</option>
+                <option value="USD">Dollar américain (USD)</option>
+            </select>
+        </div>
+
+
+        <!-- DATE -->
+        <div class="form-group">
+            <label for="date_paiement">Date de paiement</label>
+
+            <input
+                type="date"
+                name="date_paiement"
+                id="date_paiement"
+                required
+            >
+        </div>
+
+
+        <!-- STATUT -->
+        <div class="form-group">
+            <label for="statut">Statut</label>
+
+            <select name="statut" id="statut">
+                <option value="Payé" selected>Payé</option>
+                <option value="En attente">En attente</option>
+            </select>
+        </div>
+
+
+        <!-- REMARQUE -->
+        <div class="form-group">
+            <label for="remarque">Remarque</label>
+
+            <textarea
+                name="remarque"
+                id="remarque"
+                rows="3"
+                placeholder="Remarque facultative..."
+            ></textarea>
+        </div>
+
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('cotisations') }}"
+                class="btn btn-secondary"
+            >
+                Annuler
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                💾 Enregistrer la cotisation
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<style>
+
+.form-card {
+    max-width: 700px;
+    margin: 20px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #d5d9df;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    color: #6b7280;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 11px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+@media (max-width: 600px) {
+
+    .form-card {
+        margin: 10px 0;
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+}
+
+</style>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dateInput = document.getElementById("date_paiement");
+
+    if (dateInput && !dateInput.value) {
+        const aujourdHui = new Date();
+
+        const annee = aujourdHui.getFullYear();
+        const mois = String(aujourdHui.getMonth() + 1).padStart(2, "0");
+        const jour = String(aujourdHui.getDate()).padStart(2, "0");
+
+        dateInput.value = `${annee}-${mois}-${jour}`;
+    }
+
+});
+
+</script>
+
+{% endblock %}

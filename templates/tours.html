@@ -1,0 +1,816 @@
+{% extends "base.html" %}
+
+{% block title %}Tours de la tontine{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>🔄 Tours de la tontine</h1>
+        <p>Gestion des 21 semaines et des bénéficiaires.</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{{ url_for('initialiser_tours') }}"
+           class="btn btn-primary"
+           onclick="return confirm('Voulez-vous initialiser les 21 tours ?');">
+            ⚙️ Initialiser les 21 tours
+        </a>
+    </div>
+</div>
+
+
+<!-- STATISTIQUES -->
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon">🔢</div>
+        <div>
+            <span class="stat-label">Tours</span>
+            <strong>{{ tours|length }} / 21</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div>
+            <span class="stat-label">Cagnotte</span>
+            <strong>147 000 FC</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <span class="stat-label">Participants</span>
+            <strong>21</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div>
+            <span class="stat-label">Cotisation</span>
+            <strong>7 000 FC</strong>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- INFORMATION -->
+
+<div class="info-box">
+    <div class="info-icon">ℹ️</div>
+
+    <div>
+        <strong>Fonctionnement</strong>
+
+        <p>
+            Chaque semaine, les 21 membres doivent verser
+            <strong>7 000 FC</strong>.
+            La cagnotte atteint donc
+            <strong>147 000 FC</strong>,
+            qui est remise au bénéficiaire de la semaine.
+        </p>
+    </div>
+</div>
+
+
+<!-- TABLE DES TOURS -->
+
+<div class="card">
+
+    <div class="card-header">
+        <div>
+            <h2>📋 Calendrier des bénéficiaires</h2>
+            <p>Les 21 tours de la tontine.</p>
+        </div>
+
+        <span class="badge-count">
+            {{ tours|length }} tours
+        </span>
+    </div>
+
+
+    {% if tours %}
+
+    <div class="table-container">
+
+        <table class="tours-table">
+
+            <thead>
+                <tr>
+                    <th>Semaine</th>
+                    <th>Bénéficiaire</th>
+                    <th>Montant</th>
+                    <th>Date prévue</th>
+                    <th>Statut</th>
+                    <th>Date paiement</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for tour in tours %}
+
+                <tr>
+
+                    <!-- SEMAINE -->
+
+                    <td data-label="Semaine">
+
+                        <div class="week-number">
+                            S{{ tour.numero_semaine }}
+                        </div>
+
+                        <span class="week-text">
+                            Semaine {{ tour.numero_semaine }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- BENEFICIAIRE -->
+
+                    <td data-label="Bénéficiaire">
+
+                        {% if tour.membre_nom %}
+
+                            <div class="beneficiary">
+                                <div class="avatar">
+                                    {{ tour.membre_nom[0]|upper }}
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        {{ tour.membre_nom }}
+                                    </strong>
+
+                                    <small>
+                                        Bénéficiaire
+                                    </small>
+                                </div>
+                            </div>
+
+                        {% else %}
+
+                            <span class="empty">
+                                Aucun bénéficiaire
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- MONTANT -->
+
+                    <td data-label="Montant">
+
+                        <strong class="amount">
+                            {{ "{:,.0f}".format(tour.montant_prevu|float).replace(",", " ") }}
+                            FC
+                        </strong>
+
+                    </td>
+
+
+                    <!-- DATE PREVUE -->
+
+                    <td data-label="Date prévue">
+
+                        {% if tour.date_prevue %}
+
+                            {{ tour.date_prevue }}
+
+                        {% else %}
+
+                            <span class="empty">
+                                Non définie
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- STATUT -->
+
+                    <td data-label="Statut">
+
+                        {% if tour.statut == "Payé" %}
+
+                            <span class="status status-paid">
+                                ✓ Payé
+                            </span>
+
+                        {% elif tour.statut == "En cours" %}
+
+                            <span class="status status-current">
+                                ● En cours
+                            </span>
+
+                        {% else %}
+
+                            <span class="status status-planned">
+                                ○ Prévu
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- DATE PAIEMENT -->
+
+                    <td data-label="Date paiement">
+
+                        {% if tour.date_paiement %}
+
+                            {{ tour.date_paiement }}
+
+                        {% else %}
+
+                            <span class="empty">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <!-- AUCUN TOUR -->
+
+    <div class="empty-state">
+
+        <div class="empty-icon">🔄</div>
+
+        <h3>Aucun tour enregistré</h3>
+
+        <p>
+            Les 21 tours n'ont pas encore été initialisés.
+        </p>
+
+        <a href="{{ url_for('initialiser_tours') }}"
+           class="btn btn-primary"
+           onclick="return confirm('Créer les 21 tours maintenant ?');">
+
+            ⚙️ Initialiser les 21 tours
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- RAPPEL -->
+
+<div class="rules-card">
+
+    <h2>📌 Règles de la tontine</h2>
+
+    <div class="rules-grid">
+
+        <div>
+            <span>👥</span>
+            <strong>21</strong>
+            <small>Participants</small>
+        </div>
+
+        <div>
+            <span>💵</span>
+            <strong>7 000 FC</strong>
+            <small>Par membre / semaine</small>
+        </div>
+
+        <div>
+            <span>💰</span>
+            <strong>147 000 FC</strong>
+            <small>Cagnotte hebdomadaire</small>
+        </div>
+
+        <div>
+            <span>🔄</span>
+            <strong>21</strong>
+            <small>Tours au total</small>
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ================================
+   HEADER
+================================ */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0 0 5px;
+}
+
+.page-header p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* ================================
+   BOUTONS
+================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 17px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+
+/* ================================
+   STATISTIQUES
+================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+}
+
+.stat-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.stat-label {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.stat-card strong {
+    font-size: 19px;
+}
+
+
+/* ================================
+   INFORMATION
+================================ */
+
+.info-box {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    color: #1e3a8a;
+}
+
+.info-icon {
+    font-size: 22px;
+}
+
+.info-box p {
+    margin: 6px 0 0;
+    line-height: 1.5;
+}
+
+
+/* ================================
+   CARD
+================================ */
+
+.card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 3px 18px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.card-header h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+}
+
+.card-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.badge-count {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ================================
+   TABLE
+================================ */
+
+.table-container {
+    overflow-x: auto;
+}
+
+.tours-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tours-table th {
+    text-align: left;
+    padding: 14px 16px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.tours-table td {
+    padding: 15px 16px;
+    border-top: 1px solid #eef0f3;
+    vertical-align: middle;
+}
+
+.tours-table tr:hover {
+    background: #fafcff;
+}
+
+
+/* ================================
+   SEMAINE
+================================ */
+
+.week-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 35px;
+    border-radius: 9px;
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+}
+
+.week-text {
+    display: none;
+}
+
+
+/* ================================
+   BENEFICIAIRE
+================================ */
+
+.beneficiary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.beneficiary strong {
+    display: block;
+}
+
+.beneficiary small {
+    display: block;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+
+/* ================================
+   MONTANT
+================================ */
+
+.amount {
+    white-space: nowrap;
+}
+
+
+/* ================================
+   STATUTS
+================================ */
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-current {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-planned {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.empty {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+
+/* ================================
+   EMPTY STATE
+================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.empty-state h3 {
+    margin: 5px 0;
+}
+
+.empty-state p {
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+
+/* ================================
+   REGLES
+================================ */
+
+.rules-card {
+    background: white;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 3px 18px rgba(0,0,0,0.06);
+}
+
+.rules-card h2 {
+    margin-top: 0;
+}
+
+.rules-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.rules-grid div {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+}
+
+.rules-grid span {
+    display: block;
+    font-size: 25px;
+    margin-bottom: 7px;
+}
+
+.rules-grid strong {
+    display: block;
+    font-size: 18px;
+}
+
+.rules-grid small {
+    display: block;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+
+/* ================================
+   TELEPHONE
+================================ */
+
+@media (max-width: 900px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .rules-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 13px;
+    }
+
+    .stat-card strong {
+        font-size: 16px;
+    }
+
+    .card-header {
+        padding: 15px;
+    }
+
+    /* Transformation du tableau en cartes */
+
+    .tours-table,
+    .tours-table tbody,
+    .tours-table tr,
+    .tours-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .tours-table thead {
+        display: none;
+    }
+
+    .tours-table tr {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .tours-table td {
+        border: none;
+        padding: 7px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .tours-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #64748b;
+        flex-shrink: 0;
+    }
+
+    .tours-table td[data-label="Bénéficiaire"] {
+        align-items: center;
+    }
+
+    .week-number {
+        margin-left: auto;
+    }
+
+    .beneficiary {
+        margin-left: auto;
+    }
+
+    .amount {
+        margin-left: auto;
+    }
+
+    .status {
+        margin-left: auto;
+    }
+
+    .empty {
+        margin-left: auto;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rules-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .rules-grid strong {
+        font-size: 15px;
+    }
+
+    .rules-grid small {
+        font-size: 11px;
+    }
+
+}
+
+</style>
+
+{% endblock %}

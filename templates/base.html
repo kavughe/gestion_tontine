@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}Gestion Tontine{% endblock %}
+    </title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 240px;
+            background: #111827;
+            color: white;
+            padding: 20px 15px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            font-size: 38px;
+        }
+
+        .logo h1 {
+            font-size: 21px;
+            margin-top: 5px;
+        }
+
+        .logo p {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            color: #9ca3af;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 20px 10px 8px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #d1d5db;
+            text-decoration: none;
+            padding: 12px 13px;
+            border-radius: 9px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .menu a:hover {
+            background: #1f2937;
+            color: white;
+        }
+
+        .menu a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .menu-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* =========================
+           CONTENU
+        ========================= */
+
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .topbar h2 {
+            font-size: 20px;
+        }
+
+        .topbar-info {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .content {
+            padding: 25px;
+            padding-bottom: 90px;
+        }
+
+        /* =========================
+           FLASH
+        ========================= */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 13px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .flash.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .flash.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .flash.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* =========================
+           BOUTONS
+        ========================= */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        /* =========================
+           CARTES
+        ========================= */
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        /* =========================
+           MOBILE NAVIGATION
+        ========================= */
+
+        .mobile-nav {
+            display: none;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 768px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                height: 58px;
+                padding: 0 15px;
+            }
+
+            .topbar h2 {
+                font-size: 17px;
+            }
+
+            .topbar-info {
+                display: none;
+            }
+
+            .content {
+                padding: 15px;
+                padding-bottom: 85px;
+            }
+
+            .mobile-nav {
+                position: fixed;
+                display: flex;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 65px;
+                background: white;
+                border-top: 1px solid #ddd;
+                z-index: 2000;
+                justify-content: space-around;
+                align-items: center;
+                box-shadow: 0 -3px 10px rgba(0,0,0,0.08);
+            }
+
+            .mobile-nav a {
+                text-decoration: none;
+                color: #6b7280;
+                font-size: 11px;
+                text-align: center;
+                min-width: 55px;
+            }
+
+            .mobile-nav a.active {
+                color: #2563eb;
+            }
+
+            .mobile-nav .icon {
+                display: block;
+                font-size: 21px;
+                margin-bottom: 3px;
+            }
+
+            .btn {
+                min-height: 42px;
+            }
+        }
+
+        @media (max-width: 420px) {
+
+            .content {
+                padding: 10px;
+                padding-bottom: 85px;
+            }
+
+            .topbar h2 {
+                font-size: 16px;
+            }
+
+            .mobile-nav a {
+                font-size: 10px;
+            }
+
+            .mobile-nav .icon {
+                font-size: 19px;
+            }
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- =========================
+         MENU PC
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🤝
+            </div>
+
+            <h1>GESTION TONTINE</h1>
+
+            <p>
+                Gestion de la tontine
+            </p>
+
+        </div>
+
+        <div class="menu">
+
+            <div class="menu-title">
+                Principal
+            </div>
+
+            <a href="{{ url_for('index') }}">
+                <span class="menu-icon">📊</span>
+                <span>Tableau de bord</span>
+            </a>
+
+            <a href="{{ url_for('membres') }}">
+                <span class="menu-icon">👥</span>
+                <span>Membres</span>
+            </a>
+
+            <div class="menu-title">
+                Tontine
+            </div>
+
+            <a href="{{ url_for('tours') }}">
+                <span class="menu-icon">🔄</span>
+                <span>Tours</span>
+            </a>
+
+            <a href="{{ url_for('cotisations') }}">
+                <span class="menu-icon">💰</span>
+                <span>Cotisations</span>
+            </a>
+
+            <a href="{{ url_for('versements') }}">
+                <span class="menu-icon">💵</span>
+                <span>Versements</span>
+            </a>
+
+            <div class="menu-title">
+                Actions
+            </div>
+
+            <a href="{{ url_for('ajouter_membre') }}">
+                <span class="menu-icon">➕</span>
+                <span>Ajouter un membre</span>
+            </a>
+
+            <a href="{{ url_for('ajouter_cotisation') }}">
+                <span class="menu-icon">📝</span>
+                <span>Enregistrer cotisation</span>
+            </a>
+
+            <a href="{{ url_for('ajouter_versement') }}">
+                <span class="menu-icon">💸</span>
+                <span>Faire un versement</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         CONTENU PRINCIPAL
+    ========================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h2>
+                {% block page_title %}
+                Gestion Tontine
+                {% endblock %}
+            </h2>
+
+            <div class="topbar-info">
+                21 membres • 7 000 FC / semaine
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- Messages Flask -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    <div class="flash-container">
+
+                        {% for category, message in messages %}
+
+                            <div class="flash {{ category }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         MENU MOBILE
+    ========================== -->
+
+    <nav class="mobile-nav">
+
+        <a href="{{ url_for('index') }}">
+
+            <span class="icon">📊</span>
+            Accueil
+
+        </a>
+
+        <a href="{{ url_for('membres') }}">
+
+            <span class="icon">👥</span>
+            Membres
+
+        </a>
+
+        <a href="{{ url_for('tours') }}">
+
+            <span class="icon">🔄</span>
+            Tours
+
+        </a>
+
+        <a href="{{ url_for('cotisations') }}">
+
+            <span class="icon">💰</span>
+            Cotisations
+
+        </a>
+
+        <a href="{{ url_for('versements') }}">
+
+            <span class="icon">💵</span>
+            Versements
+
+        </a>
+
+    </nav>
+
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>
